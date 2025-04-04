@@ -49,3 +49,102 @@ class Solution {
         return (freshCount == 0) ? time : -1;
     }
 }
+//topological sort
+class Solution {
+    // Function to detect cycle in a directed graph.
+    public boolean isCyclic(ArrayList<ArrayList<Integer>> adj) {
+        // code here
+        int V = adj.size();
+        return topoSort(V,adj);
+    }
+    public static boolean topoSort(int V, ArrayList<ArrayList<Integer>> adj) {
+        // Step 1: Create adjacency list
+        
+
+        // Step 2: Compute indegree
+        int[] indegree = new int[V];
+        for (int i = 0; i < V; i++) {
+            for (int neighbor : adj.get(i)) {
+                indegree[neighbor]++;
+            }
+        }
+
+        // Step 3: Add all nodes with indegree 0 to queue
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < V; i++) {
+            if (indegree[i] == 0) {
+                q.offer(i);
+            }
+        }
+
+        // Step 4: Kahn's Algorithm
+        ArrayList<Integer> topo = new ArrayList<>();
+        while (!q.isEmpty()) {
+            int node = q.poll();
+            topo.add(node);
+
+            for (int neighbor : adj.get(node)) {
+                indegree[neighbor]--;
+                if (indegree[neighbor] == 0) {
+                    q.offer(neighbor);
+                }
+            }
+        }
+        if(topo.size() != V){
+            return true;
+        }
+
+        return false;
+    }
+
+}
+
+import java.util.*;
+
+class Solution {
+    public static ArrayList<Integer> topoSort(int V, int[][] edges) {
+        // Step 1: Create adjacency list
+        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < V; i++) {
+            adj.add(new ArrayList<>());
+        }
+
+        for (int[] edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            adj.get(u).add(v);
+        }
+
+        // Step 2: Compute indegree
+        int[] indegree = new int[V];
+        for (int i = 0; i < V; i++) {
+            for (int neighbor : adj.get(i)) {
+                indegree[neighbor]++;
+            }
+        }
+
+        // Step 3: Add all nodes with indegree 0 to queue
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < V; i++) {
+            if (indegree[i] == 0) {
+                q.offer(i);
+            }
+        }
+
+        // Step 4: Kahn's Algorithm
+        ArrayList<Integer> topo = new ArrayList<>();
+        while (!q.isEmpty()) {
+            int node = q.poll();
+            topo.add(node);
+
+            for (int neighbor : adj.get(node)) {
+                indegree[neighbor]--;
+                if (indegree[neighbor] == 0) {
+                    q.offer(neighbor);
+                }
+            }
+        }
+
+        return topo;
+    }
+}
