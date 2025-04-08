@@ -236,3 +236,30 @@ public class Solution
     }
 
 }
+//floyd warshall
+class Solution{
+    public static void floyd(int mat[][]){
+        int n = mat.length;
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                if(mat[i][j] == -1){
+                    mat[i][j] == 1001;
+                }
+            }
+        }
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                for(int k=0; k<n; k++){
+                    mat[i][j] = Math.min(mat[i][j] , mat[i][k]+mat[k][j]);
+                }
+            }
+        }
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                if(mat[i][j] == 1001){
+                    mat[i][j] == -1;
+                }
+            }
+        }
+    }
+}
