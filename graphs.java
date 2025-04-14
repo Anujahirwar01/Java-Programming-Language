@@ -574,3 +574,63 @@ class Solution {
         return true;
     }
 }
+//bipartite kosaraju algo 
+import java.util.*;
+
+public class Solution {
+    // First DFS to fill stack based on finish time
+    public static void dfs(int node, boolean[] vis, ArrayList<ArrayList<Integer>> edges, Stack<Integer> st) {
+        vis[node] = true;
+        for (int it : edges.get(node)) {
+            if (!vis[it]) {
+                dfs(it, vis, edges, st);
+            }
+        }
+        st.push(node);
+    }
+
+    // Second DFS on transposed graph
+    public static void dfsCount(int node, boolean[] vis, ArrayList<ArrayList<Integer>> adjT) {
+        vis[node] = true;
+        for (int it : adjT.get(node)) {
+            if (!vis[it]) {
+                dfsCount(it, vis, adjT);
+            }
+        }
+    }
+
+    public static int stronglyConnectedComponents(int V, ArrayList<ArrayList<Integer>> edges) {
+        boolean[] vis = new boolean[V];
+        Stack<Integer> st = new Stack<>();
+
+        // Step 1: Order vertices by finish time in stack
+        for (int i = 0; i < V; i++) {
+            if (!vis[i]) {
+                dfs(i, vis, edges, st);
+            }
+        }
+
+        // Step 2: Transpose the graph
+        ArrayList<ArrayList<Integer>> transpose = new ArrayList<>();
+        for (int i = 0; i < V; i++) {
+            transpose.add(new ArrayList<>());
+        }
+        for (int i = 0; i < V; i++) {
+            for (int it : edges.get(i)) {
+                transpose.get(it).add(i);
+            }
+        }
+
+        // Step 3: Do DFS on transposed graph in order of stack
+        Arrays.fill(vis, false); // Reset visited
+        int count = 0;
+        while (!st.isEmpty()) {
+            int node = st.pop();
+            if (!vis[node]) {
+                count++;
+                dfsCount(node, vis, transpose);
+            }
+        }
+        return count;
+    }
+}
