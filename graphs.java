@@ -574,7 +574,40 @@ class Solution {
         return true;
     }
 }
-//bipartite kosaraju algo 
+//bipartite
+class Solution {
+    public boolean isBipartite(int[][] graph) {
+        int n = graph.length;
+        int color[] = new int[n];
+        Arrays.fill(color,-1);
+        for(int i=0; i<n; i++){
+            if(color[i] == -1){
+                if(!isColor(i,0,graph,color)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public boolean isColor(int src ,int col, int[][] graph , int[] color){
+        color[src] = col;
+            for(int neighbour : graph[src]){
+                if(color[neighbour] == -1){
+                    color[neighbour] = 1 - color[src];
+                    if(!isColor(neighbour,color[neighbour], graph, color)) {
+                    return false;
+                }
+                }else if(color[neighbour] == color[src]){
+                    return false;
+                }
+            }
+             return true;
+
+        }
+       
+    }
+
+// kosaraju algo 
 import java.util.*;
 
 public class Solution {
