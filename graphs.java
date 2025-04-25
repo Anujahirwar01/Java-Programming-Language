@@ -771,3 +771,98 @@ class DisjointSet {
         return true;
     }
 }
+//problems on graph
+class Solution {
+    public void dfs(int src, List<List<Integer>> adList , boolean visited[]){
+        visited[src] = true;
+        for(int neighbour : adList.get(src)){
+            if(!visited[neighbour]){
+                dfs(neighbour,adList,visited);
+            }
+        }
+    }
+    public int removeStones(int[][] stones) {
+        int n = stones.length;
+        List<List<Integer>> adList = new ArrayList<>();
+        for(int i=0; i<n; i++){
+            adList.add(new ArrayList<>());
+        }
+        for(int i=0; i<n; i++){
+            for(int j=i+1; j<n; j++){
+                if(stones[i][0] == stones[j][0] || stones[i][1] == stones[j][1]){
+                    adList.get(i).add(j);
+                    adList.get(j).add(i);
+                }
+            }
+        }
+        int components = 0;
+        boolean visited[] = new boolean[n];
+        for(int i=0;i<n;i++){
+            if(!visited[i]){
+                dfs(i,adList,visited);
+                components++;
+            }
+        }
+        return n-components;
+    }
+}
+//
+class Solution {
+    public class DisjointSet {
+    int parent[];
+    int size[];
+    DisjointSet(int nodes){ //0 based (5) 0 to 4
+        this.parent = new int[nodes];
+        this.size = new int[nodes];
+        for(int i=0;i<nodes;i++){
+            this.parent[i] = i;
+            this.size[i] = 1;
+        }
+    }
+    
+    public int findRootParent(int node){
+        if(node == parent[node]){
+            return node;
+        }
+        parent[node] = findRootParent(parent[node]);
+        return parent[node];
+    }
+    public void unionBySize(int node1, int node2){
+        //1. find the root parent
+        int rootParent1 = findRootParent(node1);
+        int rootParent2 = findRootParent(node2);
+        if(rootParent1==rootParent2){
+            return;
+        }
+        // 2, union of components
+        if(size[rootParent1]<size[rootParent2]){
+            parent[rootParent1] = rootParent2;
+            size[rootParent2] += size[rootParent1];
+        }else {
+            parent[rootParent2] = rootParent1;
+            size[rootParent1] += size[rootParent2];
+        }
+    }
+    }
+    public boolean equationsPossible(String[] equations) {
+        DisjointSet dsu = new DisjointSet(26);
+        ArrayList<int[]> list = new ArrayList<>();
+        for(String equation : equations){
+            int u = equation.charAt(0) - 'a';
+            int v = equation.charAt(3) - 'a';
+            if(equation.charAt(1) == '='){
+                dsu.unionBySize(u,v);
+            }else{
+                list.add(new int[]{u,v});
+            }
+        }
+        for(int edge[] : list){
+            int u = edge[0];
+            int v = edge[1];
+            if(dsu.findRootParent(u) == dsu.findRootParent(v)){
+                return false;
+            }
+        }
+        return true;
+    }
+}
