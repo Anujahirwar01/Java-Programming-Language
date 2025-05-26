@@ -78,3 +78,23 @@ class Solution {
     // }
 }
 //
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        int n = nums.length;
+        int lis[] = new int[n];
+        Arrays.fill(lis,1);
+        int max = 1;
+        for(int i=1; i<n; i++){
+            for(int p=0; p<i; p++){
+                if(nums[i] > nums[p]){
+                lis[i] = Math.max(lis[i],lis[p]+1);
+                }
+            }
+            if(lis[i] > max){
+            max = lis[i];
+        }
+        }
+        
+        return max;
+    }
+}
