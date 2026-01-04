@@ -866,3 +866,296 @@ class Solution {
         return true;
     }
 }
+//alien dictionary
+class Solution {
+    public String alienOrder(String[] words) {
+
+        // Step 1: Build graph
+        Map<Character, List<Character>> graph = new HashMap<>();
+        Map<Character, Integer> indegree = new HashMap<>();
+
+        // initialize all characters
+        for (String word : words) {
+            for (char c : word.toCharArray()) {
+                graph.putIfAbsent(c, new ArrayList<>());
+                indegree.putIfAbsent(c, 0);
+            }
+        }
+
+        // Step 2: Build edges
+        for (int i = 0; i < words.length - 1; i++) {
+            String w1 = words[i];
+            String w2 = words[i + 1];
+
+            // invalid case
+            if (w1.length() > w2.length() && w1.startsWith(w2)) {
+                return "";
+            }
+
+            for (int j = 0; j < Math.min(w1.length(), w2.length()); j++) {
+                char c1 = w1.charAt(j);
+                char c2 = w2.charAt(j);
+
+                if (c1 != c2) {
+                    graph.get(c1).add(c2);
+                    indegree.put(c2, indegree.get(c2) + 1);
+                    break;
+                }
+            }
+        }
+
+        // Step 3: Topological Sort (Kahn’s Algorithm)
+        Queue<Character> q = new LinkedList<>();
+        for (char c : indegree.keySet()) {
+            if (indegree.get(c) == 0) {
+                q.offer(c);
+            }
+        }
+
+        StringBuilder res = new StringBuilder();
+        while (!q.isEmpty()) {
+            char curr = q.poll();
+            res.append(curr);
+
+            for (char nei : graph.get(curr)) {
+                indegree.put(nei, indegree.get(nei) - 1);
+                if (indegree.get(nei) == 0) {
+                    q.offer(nei);
+                }
+            }
+        }
+
+        // cycle check
+        if (res.length() != indegree.size()) return "";
+
+        return res.toString();
+    }
+}
+//word ladder
+class Solution {
+    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+        Set<String> wordSet = new HashSet<>(wordList);
+        if (!wordSet.contains(endWord)) {
+            return 0;
+        }
+
+        Queue<String> queue = new LinkedList<>();
+        queue.offer(beginWord);
+        Set<String> visited = new HashSet<>();
+        visited.add(beginWord);
+        int level = 1;
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                String currentWord = queue.poll();
+                if (currentWord.equals(endWord)) {
+                    return level;
+                }
+
+                char[] wordChars = currentWord.toCharArray();
+                for (int j = 0; j < wordChars.length; j++) {
+                    char originalChar = wordChars[j];
+                    for (char c = 'a'; c <= 'z'; c++) {
+                        if (c == originalChar) continue;
+                        wordChars[j] = c;
+                        String newWord = new String(wordChars);
+                        if (wordSet.contains(newWord) && !visited.contains(newWord)) {
+                            visited.add(newWord);
+                            queue.offer(newWord);
+                        }
+                    }
+                    wordChars[j] = originalChar; // revert change
+                }
+            }
+            level++;
+        }
+
+        return 0;
+    }
+}
+//number of islands
+class Solution {
+    public int numIslands(char[][] grid) {
+        int n = grid.length;
+        int m = grid[0].length;
+        boolean visited[][] = new boolean[n][m];
+        int count = 0;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(grid[i][j] == '1' && !visited[i][j]){
+                    count++;
+                    dfs(i,j,grid,visited);
+                }
+            }
+        }
+        return count;
+    }
+    public void dfs(int row, int col, char[][] grid, boolean[][] visited){
+        int n = grid.length;
+        int m = grid[0].length;
+        visited[row][col] = true;
+        int directions[][] = {
+            {-1,0},
+            {0,1},
+            {1,0},
+            {0,-1}
+        };
+        for(int direction[] : directions){
+            int nrow = row + direction[0];
+            int ncol = col + direction[1];
+            if(nrow >=0 && nrow < n && ncol >=0 && ncol < m && grid[nrow][ncol] == '1' && !visited[nrow][ncol]){
+                dfs(nrow,ncol,grid,visited);
+            }
+        }
+    }
+}
+//number of islands II
+class Solution {
+    public List<Integer> numIslands2(int n, int m, int[][] positions) {
+        List<Integer> result = new ArrayList<>();
+        DisjointSet dsu = new DisjointSet(n*m);
+        boolean visited[][] = new boolean[n][m];
+        int count = 0;
+        int directions[][] = {
+            {-1,0},
+            {0,1},
+            {1,0},
+            {0,-1}
+        };
+        for(int position[] : positions){
+            int row = position[0];
+            int col = position[1];
+            if(visited[row][col]){
+                result.add(count);
+                continue;
+            }
+            visited[row][col] = true;
+            count++;
+            int nodeNo = row * m + col;
+            for(int direction[] : directions){
+                int nrow = row + direction[0];
+                int ncol = col + direction[1];
+                int neighbourNodeNo = nrow * m + ncol;
+                if(nrow >=0 && nrow < n && ncol >=0 && ncol < m && visited[nrow][ncol]){
+                    if(dsu.unionBySize(nodeNo,neighbourNodeNo)){
+                        count--;
+                    }
+                }
+            }
+            result.add(count);
+        }
+        return result;
+    }
+    public class DisjointSet {
+        int parent[];
+        int size[];
+        DisjointSet(int nodes){ //0 based (5) 0 to 4
+            this.parent = new int[nodes];
+            this.size = new int[nodes];
+            for(int i=0;i<nodes;i++){
+                this.parent[i] = i;
+                this.size[i] = 1;
+            }
+        }
+        
+        public int findRootParent(int node){
+            if(node == parent[node]){
+                return node;
+            }
+            parent[node] = findRootParent(parent[node]);
+            return parent[node];
+        }
+        public boolean unionBySize(int node1, int node2){
+            //1. find the root parent
+            int rootParent1 = findRootParent(node1);
+            int rootParent2 = findRootParent(node2);
+            if(rootParent1==rootParent2){
+                return false;
+            }
+            // 2, union of components
+            if(size[rootParent1]<size[rootParent2]){
+                parent[rootParent1] = rootParent2;
+                size[rootParent2] += size
+[rootParent1];
+            }else {
+                parent[rootParent2] = rootParent1;
+                size[rootParent1] += size[rootParent2];
+            }
+            return true;
+        }
+    }
+}
+
+//detect cycle in directed graph
+import java.util.*;
+class Solution {
+    public boolean isCyclic(int V, ArrayList<ArrayList<Integer>> adj) {
+        // Kahn's Algorithm
+        int indegree[] = new int[V];
+        for (int i = 0; i < V; i++) {
+            for (int neighbor : adj.get(i)) {
+                indegree[neighbor]++;
+            }
+        }
+
+        // Step 3: Add all nodes with indegree 0 to queue
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < V; i++) {
+            if (indegree[i] == 0) {
+                q.offer(i);
+            }
+        }
+
+        // Step 4: Kahn's Algorithm
+        int count = 0;
+        while (!q.isEmpty()) {
+            int node = q.poll();
+            count++;
+
+            for (int neighbor : adj.get(node)) {
+                indegree[neighbor]--;
+                if (indegree[neighbor] == 0) {
+                    q.offer(neighbor);
+                }
+            }
+        }
+        return count != V;
+    }
+}
+//topological sort using kahn's algorithm
+import java.util.*;
+class Solution {
+    public ArrayList<Integer> topoSort(int V, ArrayList<ArrayList<Integer>> adj) {
+        // Kahn's Algorithm
+        int indegree[] = new int[V];
+        for (int i
+    = 0; i < V; i++) {
+                for (int neighbor : adj.get(i)) {
+                    indegree[neighbor]++;
+                }
+            }   
+        // Step 3: Add all nodes with indegree 0 to queue
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < V; i++) {
+            if (indegree[i] == 0) {
+                q.offer(i);
+            }
+        }
+        // Step 4: Kahn's Algorithm
+        ArrayList<Integer> topo = new ArrayList<>();
+        while (!q.isEmpty()) {
+            int node = q.poll();
+            topo.add(node);
+
+            for (int neighbor : adj.get(node)) {
+                indegree[neighbor]--;
+                if (indegree[
+neighbor] == 0) {
+                    q.offer(neighbor);
+                }   
+            }
+        }
+        return topo;
+    }
+}
