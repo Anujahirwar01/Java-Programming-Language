@@ -118,3 +118,84 @@ public static long power(long base, long exp) {
         return base * power(base, exp - 1);
     }
 }
+// 6. Fibonacci Sequence
+public static int fibonacci(int n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+// 7. Tower of Hanoi
+public static void towerOfHanoi(int n, char source, char target, char auxiliary)
+{
+    if (n == 1) {
+        System.out.println("Move disk 1 from rod " + source + " to rod " + target);
+        return;
+    }
+    towerOfHanoi(n - 1, source, auxiliary, target);
+    System.out.println("Move disk " + n + " from rod " + source + " to rod " + target);
+    towerOfHanoi(n - 1, auxiliary, target, source);
+}
+// 8. Count Inversions in an Array
+public static int countInversions(int[] arr, int left, int right) {
+    int count = 0;
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        count += countInversions(arr, left, mid);
+        count += countInversions(arr, mid + 1, right);
+        count += mergeAndCount(arr, left, mid, right);
+    }
+    return count;
+}
+public static int mergeAndCount(int[] arr, int left, int mid, int right) {
+    int[] leftArr = java.util.Arrays.copyOfRange(arr, left, mid + 1);
+    int[] rightArr = java.util.Arrays.copyOfRange(arr, mid + 1, right + 1);
+    
+    int i = 0, j = 0, k = left, swaps = 0;
+    while (i < leftArr.length && j < rightArr.length) {
+        if (leftArr[i] <= rightArr[j]) {
+            arr[k++] = leftArr[i++];
+        } else {
+            arr[k++] = rightArr[j++];
+            swaps += (mid + 1) - (left + i);
+        }
+    }
+    
+    while (i < leftArr.length) arr[k++] = leftArr[i++];
+    while (j < rightArr.length) arr[k++] = rightArr[j++];
+    
+    return swaps;
+}
+// 9. Find Majority Element
+public static int majorityElement(int[] nums, int left, int right) {
+    if (left == right) return nums[left];
+    
+    int mid = left + (right - left) / 2;
+    int leftMajor = majorityElement(nums, left, mid);
+    int rightMajor = majorityElement(nums, mid + 1, right);
+    
+    if (leftMajor == rightMajor) return leftMajor;
+    
+    int leftCount = countInRange(nums, leftMajor, left, right);
+    int rightCount = countInRange(nums, rightMajor, left, right);
+    
+    return leftCount > rightCount ? leftMajor : rightMajor;
+}
+public static int countInRange(int[] nums, int num, int left, int right) {
+    int count = 0;
+    for (int i = left; i <= right; i++) {
+        if (nums[i] == num) count++;
+    }
+    return count;
+}
+// 10. Find Kth Smallest Element
+public static int kthSmallest(int[] arr, int left, int right, int k)
+{
+    if (k > 0 && k <= right - left + 1) {
+        int pos = partition(arr, left, right);
+        
+        if (pos - left == k - 1) return arr[pos];
+        if (pos - left > k - 1) return kthSmallest(arr, left, pos - 1, k);
+        
+        return kthSmallest(arr, pos + 1, right, k - pos + left - 1);
+    }
+    return Integer.MAX_VALUE;
+}
